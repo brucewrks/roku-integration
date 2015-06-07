@@ -1,6 +1,4 @@
 (function() {
-	// curl -d '' 'http://192.168.1.122:8060/launch/15985?t=v&u=http://192.168.1.144/torrents/300%20(2006)%20%5b1080p%5d/300.2006.BluRay.1080p.x264.YIFY.mp4&videoName=Podcast&videoFormat=mp4'
-
 	var http = require('http'),
 		rokuHost = '192.168.1.122';
 
@@ -13,8 +11,12 @@
 			var param1 = req.url.split('=')[1].split('&')[0];
 			var param2 = req.url.split('=')[2];
 
-			console.log(param1, param2);
-			doRequest('/launch/15985?t=v&u=' + param1 + '&videoName=' + param2 + '&videoFormat=mp4');
+			var videoFormat;
+			if(param1.indexOf('.mkv') !== -1) videoFormat = 'mkv';
+			else videoFormat = 'mp4';
+
+			console.log(param1, param2, videoFormat);
+			doRequest('/launch/15985?t=v&u=' + param1 + '&videoName=' + param2 + '&videoFormat=' + videoFormat);
 		}
 
 		res.write('Parameter: ');
@@ -43,5 +45,6 @@
 	// Reset
 	//doRequest('/launch/15985?t=v&u=http%3A%2F%2F192.168.1.144%2Ftorrents%2F300%2520(2006)%2520%255b1080p%255d%2F300.2006.BluRay.1080p.x264.YIFY.mp4&videoName=300&videoFormat=mp4');
 
+	// ffmpeg -i movies/fate.mkv -q:v 1 -acodec libfaac -vcodec mpeg4 http://192.168.1.144:8888/feed1.ffm
 	server.listen(1337);
 })();

@@ -6,8 +6,8 @@ function the_header() {
 	<html>
 
 		<head>
-			<title>Bruce's Media</title>
-			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/darkly/bootstrap.min.css" />
+			<title>Roku Media Player</title>
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/slate/bootstrap.min.css" />
 
 			<style>
 				div.row > div {
@@ -30,6 +30,9 @@ function footer() {
 	?>
 				</div>
 			</div>
+
+			<script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+			<script type="application/javascript" src="/includes/site.js"></script>
 		</body>
 
 	</html>
