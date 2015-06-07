@@ -7,7 +7,17 @@ function the_header() {
 
 		<head>
 			<title>Bruce's Media</title>
-			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/darkly/bootstrap.min.css" />
+
+			<style>
+				div.row > div {
+					margin-bottom: 10px;
+				}
+
+				div.row > div > img {
+					margin-bottom: 5px;
+				}
+			</style>
 		</head>
 
 		<body>

@@ -1,5 +1,6 @@
 <?php
 require(dirname(__FILE__) . '/content.php');
+require(dirname(__FILE__) . '/thumbs.php');
 the_header();
 
 	$uri = $_SERVER['REQUEST_URI'];
@@ -9,13 +10,33 @@ the_header();
 		$files = scandir($req);
 
 		echo '<h1>What do you want to watch?</h1>';
-		echo '<ul style="font-size: 16px;">';
+		echo '<div class="row">';
 			foreach($files as $file) {
 				if(strpos($file, '.') === 0 || strpos($file, '~') === 0) continue;
 
-				echo '<li style="margin: 15px;"><a href="http://192.168.1.144/' . ltrim($uri, '/') . '/' . $file . '">' . $file . '</a></li>';
+				$shortname = base64_encode($req . '/' . $file);
+				$thumb = get_thumb($shortname);
+
+				$link = 'http://192.168.1.144/' . ltrim($uri, '/') . '/' . $file;
+
+				// Cleans up filenames to make them more legible
+				$nicename = str_replace('_', ' ', $file);
+				$nicename = preg_replace('/\\.[^.\\s]{3,4}$/', '', $nicename);
+				$nicename = trim(preg_replace('/\([^)]+\)/', '', $nicename));
+				$nicename = str_replace('.', ' ', $nicename);
+
+				?>
+				<div class="col-lg-3 col-md-4 col-xs-6" style="text-align: center;">
+					<a href="<?php echo $link; ?>">
+						<img src="<?php echo $thumb; ?>" class="img-responsive" />
+						<div class="center-block" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">
+							<?php echo $nicename;?>
+						</div>
+					</a>
+				</div>
+				<?php
 			}
-		echo '</ul>';
+		echo '</div>';
 	} elseif (is_file($req)) {
 		echo '<h1>Sending Request to play on Roku...</h1>';
 
