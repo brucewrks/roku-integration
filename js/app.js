@@ -1,41 +1,61 @@
 (function() {
-	var http = require('http'),
-		rokuHost = '192.168.1.122';
+	var http = require('http');
+
+	var ffmpeg = require(__dirname + '/lib/transcode.js'),
+			roku = require(__dirname + '/lib/roku.js'),
+			torrent = require(__dirname + '/lib/torrent.js');
 
 	// Private Roku Implementation Server
 	var server = http.createServer(function(req, res) {
 		res.writeHead(200, {'Content-Type': 'text/plain'});
 
-		if(!req.url.match(/^\/\?url=/)) console.log('Not a valid request: ' + req.url);
-		else {
-			var param1 = req.url.split('=')[1].split('&')[0];
-			var param2 = req.url.split('=')[2];
+		if(req.url === '/favicon.ico') return res.end();
 
-			var videoFormat;
-			if(param1.indexOf('.mkv') !== -1) videoFormat = 'mkv';
-			else videoFormat = 'mp4';
+		if(req.url.match(/^\/play\?url=/)) { // Play video on Roku
+			var url = req.url.split('=')[1].split('&')[0],
+					name = req.url.split('=')[2],
+					videoFormat = 'mp4';
 
-			console.log(param1, param2, videoFormat);
-			doRequest('/launch/15985?t=v&u=' + param1 + '&videoName=' + param2 + '&videoFormat=' + videoFormat);
+			roku.doRequest('/launch/15985?t=v&u=' + url + '&videoName=' + name + '&videoFormat=' + videoFormat);
+			res.end();
+		} else if(req.url.match(/^\/search?q=/)) { // Search The Pirate Bay
+			var q = decodeURIComponent(req.url.split('=')[1]);
+
+			torrent.searchTPB(q, function(json) {
+				res.end(json);
+			});
+		} else if(req.url.match(/^\/download?q=/)) {
+			var q = decodeURIComponent(req.url.split('=')[1]);
+
+			console.log(q);
 		}
-
-		res.write('Parameter: ');
-		res.end('Got request!');
 	});
 
-	var doRequest = function(uri) {
-		var opts = {
-			hostname: rokuHost,
-			port: 8060,
-			path: uri,
-			method: 'POST',
-			headers: {}
-		};
+	// Reencoding
+	var queue = [],
+		processing = false;
 
-		var req = http.request(opts);
-		req.on('error', function() {});
-		req.end();
+	var addToQueue = function() {
+		// Add file to queue.
 	};
+
+	var processQueue = function() {
+		if(!queue.length || processing === false) return;
+
+		processing = true;
+
+		ffmpeg.transcode(nextVideo, '/tmp/' + nextVideo, function() {
+			var nextVideo = queue[0];
+			queue = queue.slice(1);
+
+			processing = false;
+		});
+	};
+
+	//setInterval(processQueue, 2000);
+
+	//ffmpeg.transcode('/users/bruce/movies/fate.mkv', '/users/bruce/movies/fate.mp4');
+
 
 	// ffmpeg -i fate.mkv -qscale 1 -acodec libfaac -vcodec mpeg4 fate-stay.m4v
 	// See: https://trac.ffmpeg.org/wiki/HowToBurnSubtitlesIntoVideo
@@ -43,8 +63,6 @@
 	//      http://andrebluehs.net/blog/converting-avi-to-mp4-with-ffmpeg/
 
 	// Reset
-	//doRequest('/launch/15985?t=v&u=http%3A%2F%2F192.168.1.144%2Ftorrents%2F300%2520(2006)%2520%255b1080p%255d%2F300.2006.BluRay.1080p.x264.YIFY.mp4&videoName=300&videoFormat=mp4');
+	  server.listen(1337);
 
-	// ffmpeg -i movies/fate.mkv -q:v 1 -acodec libfaac -vcodec mpeg4 http://192.168.1.144:8888/feed1.ffm
-	server.listen(1337);
 })();

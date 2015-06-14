@@ -43,7 +43,7 @@ the_header();
 		echo '<h1>Sending Request to play on Roku...</h1>';
 
 		$file = explode('/', $req);
-		file_get_contents('http://127.0.0.1:1337/?url=' . rawurlencode('http://192.168.1.144/torrents/' . ltrim($uri, '/')) . '&name=' . rawurlencode(end($file)));
+		file_get_contents('http://127.0.0.1:1337/play?url=' . rawurlencode('http://192.168.1.144/torrents/' . ltrim($uri, '/')) . '&name=' . rawurlencode(end($file)));
 	} else {
 		echo '<h1>Invalid URI</h1>';
 	}
